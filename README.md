@@ -29,8 +29,9 @@ docker run -d \
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ACCEPT_LICENSE` | Accept the license agreement (`yes` required on first run) | - |
+| `LOG_TO_FILE` | Enable file logging with log rotation | `false` |
 | `FLUHOMS_DATA_PATH` | Data directory path | `/data` |
-| `FLUHOMS_LOG_PATH` | Logs directory path | `/data/logs` |
+| `FLUHOMS_LOG_PATH` | Logs directory path (when `LOG_TO_FILE=true`) | `/data/logs` |
 
 ## Data Persistence
 
@@ -142,9 +143,22 @@ The image includes a built-in health check. Verify the container status:
 docker inspect --format='{{.State.Health.Status}}' fluhoms-runner
 ```
 
-## Log Rotation
+## Logging
 
-Log rotation is configured automatically:
+By default, logs are sent to **stdout/stderr only**, which integrates with Docker and Kubernetes logging drivers.
+
+To enable **file logging** with automatic rotation, set `LOG_TO_FILE=true`:
+
+```bash
+docker run -d \
+  --name fluhoms-runner \
+  -e ACCEPT_LICENSE=yes \
+  -e LOG_TO_FILE=true \
+  -v fluhoms-runner-data:/data \
+  ghcr.io/fluhoms/fluhoms-runner:latest
+```
+
+When enabled, log rotation runs automatically:
 
 - **Frequency**: Daily or when a file exceeds 100 MB
 - **Retention**: 7 compressed files, up to 30 days
