@@ -18,6 +18,7 @@ Self-hosted ETL execution agent. Deploy the Fluhoms Runner on Docker, Kubernetes
 docker run -d \
   --name fluhoms-runner \
   -e ACCEPT_LICENSE=yes \
+  -e REGISTER_CODE=your-register-code \
   -v fluhoms-runner-data:/data \
   ghcr.io/fluhoms/fluhoms-runner:latest
 ```
@@ -29,9 +30,24 @@ docker run -d \
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ACCEPT_LICENSE` | Accept the license agreement (`yes` required on first run) | - |
+| `REGISTER_CODE` | Registration code for auto-registration (see below) | - |
 | `LOG_TO_FILE` | Enable file logging with log rotation | `false` |
 | `FLUHOMS_DATA_PATH` | Data directory path | `/data` |
 | `FLUHOMS_LOG_PATH` | Logs directory path (when `LOG_TO_FILE=true`) | `/data/logs` |
+
+### Registration
+
+The `REGISTER_CODE` is generated from your Fluhoms workspace. When provided, the runner **automatically registers itself** on startup if it is not already registered.
+
+- If the runner is already registered with the same code, nothing happens
+- If the code changes, the runner re-registers with the new code
+- The registration state is persisted in the `/data` volume
+
+You can also register manually without using the environment variable:
+
+```bash
+docker exec -it fluhoms-runner fluhoms_runner register YOUR_CODE
+```
 
 ## Data Persistence
 
